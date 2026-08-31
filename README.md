@@ -13,6 +13,10 @@ restricts the site to the owner's email.
 The image is digest-pinned. Dependabot proposes reviewed digest updates weekly.
 No environment file, database, or server-side storage is required.
 
+Pushes to `main` are sent to ds1's signed fleet webhook. The deployer verifies
+the signature and placement manifest before pulling the commit and recreating
+the Compose project.
+
 ## Data model
 
 This is the official client-only self-hosted build. Drawings stay in the
