@@ -1,0 +1,11 @@
+[Unit]
+Description=Nightly ExcaliDash backup
+
+[Timer]
+OnCalendar=*-*-* 04:00:00
+RandomizedDelaySec=30m
+Persistent=true
+Unit=excalidraw-backup.service
+
+[Install]
+WantedBy=timers.target

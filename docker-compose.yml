@@ -1,13 +1,57 @@
 services:
-  excalidraw:
-    image: excalidraw/excalidraw:latest@sha256:f7ee194addd607bf831d2af0f0a34463dd4225e426cf35199ef0b12a803398e9
-    ports:
-      - "127.0.0.1:8099:80"
-    healthcheck:
-      test: [CMD, wget, --quiet, --spider, http://127.0.0.1/]
-      interval: 10s
-      timeout: 5s
-      retries: 12
+  backend:
+    image: zimengxiong/excalidash-backend:0.6.0@sha256:cbdab75f31b21e342b464d6404a454791e5da7452e3614b137021a800fc4cac6
+    init: true
+    env_file:
+      - ${EXCALIDRAW_ENV_FILE:-/etc/homeserver/excalidraw.env}
+    environment:
+      DATABASE_PROVIDER: sqlite
+      DATABASE_URL: file:/app/prisma/dev.db
+      PORT: "8000"
+      NODE_ENV: production
+      # Cloudflare Access is the authentication boundary. Disabled mode gives
+      # the one authorized owner a seamless single-user workspace.
+      AUTH_MODE: disabled
+      FRONTEND_URL: https://excalidraw.jdealla.com
+      TRUST_PROXY: "1"
+      ENFORCE_HTTPS_REDIRECT: "false"
+      UPDATE_CHECK_OUTBOUND: "false"
+      SNAPSHOT_RETENTION_DAYS: "30"
+      # v0.6.0's built-in scheduler has an upstream SQLite checkpoint bug.
+      # The host timer calls scripts/backup-now.sh instead.
+      BACKUP_DIR: /app/backups
+      BACKUP_RETENTION_DAYS: "30"
+    volumes:
+      - ${EXCALIDRAW_DATA_DIR:-/mnt/storage/appdata/excalidraw/prisma}:/app/prisma
+      - ${EXCALIDRAW_BACKUP_DIR:-/mnt/nas-backups/backups/excalidraw}:/app/backups
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "require('http').get('http://127.0.0.1:8000/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1))"
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+  frontend:
+    image: zimengxiong/excalidash-frontend:0.6.0@sha256:4ec5b20c03034b96d37cfb87b5c39e9cc5958441a3abd8dcc413d11dfb11809c
+    environment:
+      BACKEND_URL: backend:8000
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:8099:80"
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: [CMD, wget, --quiet, --tries=1, --spider, http://127.0.0.1/]
+      interval: 10s
+      timeout: 5s
+      retries: 12
