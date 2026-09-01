@@ -37,7 +37,7 @@ Dependabot proposes reviewed image updates weekly.
 ## Retention and recovery
 
 Drawing history is retained for 30 days. A consistent SQLite online backup runs
-nightly at `04:00` local time and keeps 30 days of copies on ds2. ExcaliDash
+nightly at `04:00 UTC` and keeps 30 days of copies on ds2. ExcaliDash
 v0.6.0's built-in scheduled backup has an upstream SQLite checkpoint defect,
 so a host systemd timer invokes the same database library without that broken
 checkpoint call. Create and verify a backup on demand from ds1 with:
