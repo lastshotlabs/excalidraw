@@ -39,7 +39,7 @@ services:
       start_period: 30s
 
   frontend:
-    image: zimengxiong/excalidash-frontend:0.6.0@sha256:4ec5b20c03034b96d37cfb87b5c39e9cc5958441a3abd8dcc413d11dfb11809c
+    image: zimengxiong/excalidash-frontend:0.6.6@sha256:081500ab351551b54184434d28cd7a3504df9c9e991f1ba3bf202e89e3312c53
     environment:
       BACKEND_URL: backend:8000
     depends_on:
