@@ -1,6 +1,6 @@
 services:
   backend:
-    image: zimengxiong/excalidash-backend:0.6.0@sha256:cbdab75f31b21e342b464d6404a454791e5da7452e3614b137021a800fc4cac6
+    image: zimengxiong/excalidash-backend:0.6.6@sha256:0ac551ef3dab403c182d208aae08208a343e973313a5d6a0a9f01220e4f5ad8a
     init: true
     env_file:
       - ${EXCALIDRAW_ENV_FILE:-/etc/homeserver/excalidraw.env}
